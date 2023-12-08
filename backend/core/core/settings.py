@@ -29,6 +29,14 @@ ALLOWED_HOSTS = []
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ],
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+}
 
 # Application definition
 
