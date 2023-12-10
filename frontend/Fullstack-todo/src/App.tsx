@@ -1,35 +1,64 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import TodoForm from "./components/todoform";
+import Table from "./components/table";
+import axios, { AxiosResponse } from "axios";
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+export interface Todo {
+  // Define your todo item properties here
+  id: number;
+  // other properties...
 }
 
-export default App
+const App = () => {
+  const [todo, setTodo] = useState<Todo[]>([]);
+
+  const fetchData = async () => {
+    try {
+      const response: AxiosResponse<Todo[]> = await axios.get(
+        "http://127.0.0.1:8000/v1/api/todo/"
+      );
+      console.log(response.data);
+      setTodo(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+  const deleteTodo = async (id) => {
+    try {
+      const dlt = await axios.delete(
+        `http://127.0.0.1:8000/v1/api/todo/${id}/`
+      );
+      const newdlte = todo.filter((item) => {
+        return item.id !== id;
+      });
+      setTodo(newdlte);
+      console.log(dlt);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleEdit = async (id, value) => {
+    try {
+      const response = await axios.patch(
+        `http://127.0.0.1:8000/v1/api/todo/${id}/`,
+        value
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  return (
+    <>
+      <div className=" ">
+        <TodoForm fetchData={fetchData} deleteTodo={deleteTodo} />
+        <Table todo={todo} setTodo={setTodo} deleteTodo={deleteTodo} />
+      </div>
+    </>
+  );
+};
+
+export default App;
